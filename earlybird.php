@@ -66,67 +66,65 @@ function earlybird_civicrm_buildForm($formName, &$form) {
 
     case 'CRM_Contribute_Form_Contribution_Main':
 
-      $contactID = $form->getContactID();
-      if (!$contactID) {
-        return;
-      }
+      $memberships = array();
+      
+      if ($contactID = $form->getContactID()) {
 
-      $result = civicrm_api3('Membership', 'get', array(
-        'sequential' => 1,
-        'options' => array(
-          'limit' => 0,
-        ),
-        'return' => 'status_id,membership_type_id',
-        'contact_id' => $contactID,
-      ));
-      if ($result['is_error'] || ($result['count'] == 0)) {
-        return;
-      }
-      $memberships = $result['values'];
-
-      $pageID = $form->getVar('_id');
-
-      $dao = new CRM_Price_DAO_PriceSetEntity();
-      $dao->entity_id = $pageID;
-      $dao->entity_table = 'civicrm_contribution_page';
-      if (!$dao->find(TRUE)) {
-        return;
-      }
-
-      $result = civicrm_api3('PriceField', 'get', array(
-        'sequential' => 1,
-        'options' => array(
-          'limit' => 0,
-        ),
-        'return' => 'id',
-        'price_set_id' => $dao->price_set_id,
-      ));
-      if ($result['is_error'] || ($result['count'] == 0)) {
-        return;
-      }
-
-      $price_fields = $result['values'];
-      foreach($price_fields as &$price_field) {
-        $price_field['earlybird'] = '';
-        $result = civicrm_api3('PriceFieldValue', 'get', array(
+        $result = civicrm_api3('Membership', 'get', array(
           'sequential' => 1,
           'options' => array(
             'limit' => 0,
           ),
-          'return' => 'membership_type_id',
-          'price_field_id' => $price_field['id'],
+          'return' => 'status_id,membership_type_id',
+          'contact_id' => $contactID,
         ));
-        if ($result['is_error'] || ($result['count'] == 0)) {
-          continue;
-        }
-        foreach($result['values'] as $value) {
-          if ($value['membership_type_id']) {
-            $types[] = $value['membership_type_id'];
-            $price_field['earlybird'] = 1;
-          }
+        if (!$result['is_error']) {
+          $memberships = $result['values'];
         }
       }
-      $types = array_values(array_unique($types));
+
+      $price_fields = $types = array();
+
+      $dao = new CRM_Price_DAO_PriceSetEntity();
+      $dao->entity_id = $form->getVar('_id');
+      $dao->entity_table = 'civicrm_contribution_page';
+
+      if ($dao->find(TRUE)) {
+
+        $result = civicrm_api3('PriceField', 'get', array(
+          'sequential' => 1,
+          'options' => array(
+            'limit' => 0,
+          ),
+          'return' => 'id',
+          'price_set_id' => $dao->price_set_id,
+        ));
+        if (!$result['is_error']) {
+
+          $price_fields = $result['values'];
+          foreach($price_fields as &$price_field) {
+            $price_field['earlybird'] = '';
+            $result = civicrm_api3('PriceFieldValue', 'get', array(
+              'sequential' => 1,
+              'options' => array(
+                'limit' => 0,
+              ),
+              'return' => 'membership_type_id',
+              'price_field_id' => $price_field['id'],
+            ));
+            if ($result['is_error'] || ($result['count'] == 0)) {
+              continue;
+            }
+            foreach($result['values'] as $value) {
+              if ($value['membership_type_id']) {
+                $types[] = $value['membership_type_id'];
+                $price_field['earlybird'] = 1;
+              }
+            }
+          }
+          $types = array_values(array_unique($types));
+        }
+      }
 
       $products = $earlybird = array();
 
