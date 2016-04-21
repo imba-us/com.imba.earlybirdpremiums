@@ -24,6 +24,12 @@
             <span class="description">{ts}Select the membership statuses this premium should be displayed for.{/ts}</span>
          </td>
       </tr>
+      <tr class="crm-contribution-form-block-eb_hide_product">
+         <td class="label">{$form.eb_hide_product.label}</td>
+         <td class="html-adjust">{$form.eb_hide_product.html}<br />
+            <span class="description">{ts}Hide the selected premium when this premium is displayed.{/ts}</span>
+         </td>
+      </tr>
     </table>
   </div>
 </fieldset>

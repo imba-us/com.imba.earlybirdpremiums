@@ -86,6 +86,12 @@ class CRM_Earlybird_DAO_ProductSettings extends CRM_Core_DAO
    * @var string
    */
   public $membership_statuses;
+  /**
+   * Product to hide
+   *
+   * @var int unsigned
+   */
+  public $hide_product;
 
   function __construct()
   {
@@ -120,14 +126,14 @@ class CRM_Earlybird_DAO_ProductSettings extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Enabled?'),
           'description' => 'Enabled?',
-          'defautl' => 0,
+          'default' => 0,
         ),
         'is_strict' => array(
           'name' => 'is_strict',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Strict?'),
           'description' => 'Strict?',
-          'defautl' => 0,
+          'default' => 0,
         ),
         'membership_types' => array(
           'name' => 'membership_types',
@@ -144,6 +150,13 @@ class CRM_Earlybird_DAO_ProductSettings extends CRM_Core_DAO
           'description' => 'Membership statuses',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+        ),
+        'hide_product' => array(
+          'name' => 'hide_product',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Hide Product'),
+          'description' => 'Hide Product',
+          'default' => 0,
         ),
       );
     }
@@ -165,6 +178,7 @@ class CRM_Earlybird_DAO_ProductSettings extends CRM_Core_DAO
         'is_strict' => 'is_strict',
         'membership_types' => 'membership_types',
         'membership_statuses' => 'membership_statuses',
+        'hide_product' => 'hide_product',
       );
     }
     return self::$_fieldKeys;

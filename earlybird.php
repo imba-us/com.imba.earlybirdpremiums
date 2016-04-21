@@ -45,6 +45,23 @@ function earlybird_civicrm_buildForm($formName, &$form) {
       }
       $form->add('select', 'eb_membership_statuses', ts('Membership Status(es)'), $options, FALSE, array('class' => 'crm-select2', 'multiple' => TRUE));
 
+      $options = array(0 => 'None');
+      $result = civicrm_api3('Product', 'get', array(
+        'sequential' => 1,
+        'options' => array(
+          'limit' => 0,
+          'sort' => 'name',
+        ),
+        'return' => 'id,name',
+        'is_active' => 1,
+      ));
+      if (!$result['is_error']) {
+        foreach($result['values'] as $product) {
+          $options[$product['id']] = $product['name'];
+        }
+      }
+      $form->add('select', 'eb_hide_product', ts('Hide Premium'), $options, FALSE, array('class' => 'crm-select2', 'multiple' => FALSE));
+
       CRM_Core_Region::instance('contribute-form-managepremiums-other-fields')->add(array(
         'template' => 'Earlybird/Contribute/Form/ManagePremiums.tpl',
         'name' => 'earlybird',
@@ -58,6 +75,7 @@ function earlybird_civicrm_buildForm($formName, &$form) {
           'eb_is_strict' => $dao->is_strict,
           'eb_membership_types' => explode(',', $dao->membership_types),
           'eb_membership_statuses' => explode(',', $dao->membership_statuses),
+          'eb_hide_product' => $dao->hide_product,
         );
         $form->setDefaults($defaults);
       }
@@ -126,7 +144,7 @@ function earlybird_civicrm_buildForm($formName, &$form) {
         }
       }
 
-      $products = $earlybird = array();
+      $products = $earlybird = $hide = array();
 
       $_products = $form->get_template_vars('products');
       foreach($_products as $key => $product) {
@@ -152,8 +170,14 @@ function earlybird_civicrm_buildForm($formName, &$form) {
             }
             $earlybird['premium_id-' . $product['id']] = $dao->membership_types;
           }
+          if ($dao->hide_product) {
+            $hide[] = $dao->hide_product;
+          }
         }
         $products[$key] = $product;
+      }
+      foreach($hide as $key) {
+        unset($products[$key]);
       }
       $form->assign('products', $products);
 
@@ -183,6 +207,7 @@ function earlybird_civicrm_postProcess($formName, &$form) {
     $dao->is_strict = !empty($values['eb_is_strict']) ? 1 : 0;
     $dao->membership_types = implode(',', $values['eb_membership_types']);
     $dao->membership_statuses = implode(',', $values['eb_membership_statuses']);
+    $dao->hide_product = $values['eb_hide_product'];
     $dao->save();
   }
 
@@ -223,6 +248,7 @@ function earlybird_civicrm_install() {
                               `is_strict` tinyint(4) NOT NULL DEFAULT '0',
                               `membership_types` varchar(255),
                               `membership_statuses` varchar(255),
+                              `hide_product` int(11) unsigned NOT NULL DEFAULT '0',
                               PRIMARY KEY (`id`)
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 }
