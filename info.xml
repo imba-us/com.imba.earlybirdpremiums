@@ -9,9 +9,9 @@
     <email>dreedy@klangsoft.com</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">https://github.com/fulltrucker/com.imba.earlybirdpremiums</url>
-    <url desc="Documentation">https://github.com/fulltrucker/com.imba.earlybirdpremiums</url>
-    <url desc="Support">https://github.com/fulltrucker/com.imba.earlybirdpremiums</url>
+    <url desc="Main Extension Page">https://github.com/imba-us/com.imba.earlybirdpremiums</url>
+    <url desc="Documentation">https://github.com/imba-us/com.imba.earlybirdpremiums</url>
+    <url desc="Support">https://github.com/imba-us/com.imba.earlybirdpremiums</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2016-04-21</releaseDate>
